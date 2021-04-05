@@ -1,0 +1,95 @@
+{% extends 'shop/base.html' %}
+{% block title %}{{product.product_name}} - My Awesome Cart{% endblock title %}
+{% block body %}
+<div class="container my-4">
+    <div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <img src="/media/{{product.image}}" width="250px" height="370px" alt="">
+        </div>
+        <div class="row my-4">
+           <a href="/shop/checkout"> <button class="btn btn-primary mx-3"> Buy Now</button></a>
+           <span id="divpr{{product.id}}" class="divpr">
+            <button id="pr{{product.id }}" class="btn btn-primary cart"> Add To Cart</button>
+            </span>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h5>{{product.product_name}}</h5>
+        <p><b>Rs. {{product.price}}</b></p>
+        <p>{{product.desc}}</p>
+    </div>
+</div>
+</div>
+{% endblock body %}
+
+
+{% block js %}
+<script>
+  console.log("it`s working");
+  function updateCart(cart){
+    var sum = 0;
+    for(var item in cart){
+      {% comment %} console.log(item) {% endcomment %}
+      document.getElementById('div'+item).innerHTML="<button id='minus"+ item + "'class='btn btn-primary minus'>-</button> <span id='val"+ item+"''>"+ cart[item]+"</span> <button id='plus"+ item + "'class='btn btn-primary plus' >+</button>";
+       sum = sum + cart[item]
+    }
+    localStorage.setItem('cart', JSON.stringify(cart))
+    document.getElementById('cart').innerHTML = sum;
+    console.log(cart)
+    
+
+  };
+
+  $('.divpr').on('click', 'button.cart', function(){
+    var idstr = this.id.toString();
+    console.log(idstr);
+    if (cart[idstr] != undefined) {
+      qty = cart[idstr]+ 1;
+      //name = "myName"
+      //cart[idstr] = /*cart[idstr] + 1;*/  [qty, name];
+    } else {
+      qty = 1;
+      cart[idstr] = [qty];
+    }
+    updateCart(cart);
+    
+  });
+ if (localStorage.getItem('cart') == null) {
+    var cart = {};
+
+  } else {
+    cart = JSON.parse(localStorage.getItem('cart'));
+  }
+  sum = 0;
+  for(item in cart){
+    let qty  = cart[item][0];
+    sum = sum + qty;
+
+  }
+  document.getElementById('cart').innerHTML=sum;
+
+    {% comment %} if plus or minus button is clicked, change the cart item or as well increment/decrement the item  {% endcomment %}
+$('.divpr').on("click", "button.minus", function() {
+   a= this.id.slice(7, );
+   cart['pr'+a] = cart['pr'+a]-1;
+    cart['pr'+a] = Math.max(0, cart['pr'+a])
+   document.getElementById('valpr' + a).innerHTML = cart['pr'+a]
+   updateCart(cart);
+
+});
+$('.divpr').on("click", "button.plus", function() {
+     a= this.id.slice(6, );
+   cart['pr'+a] = cart['pr'+a]+1;
+   document.getElementById('valpr' + a).innerHTML = cart['pr'+a];
+   updateCart(cart);
+
+});
+
+  $('#popcart').popover();
+  document.getElementById("popcart").setAttribute('data-content', '<h5>Cart for your items in my shopping cart</h5>');
+</script>
+{% endblock js %}
+
+
